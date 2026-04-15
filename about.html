@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>About – SHOPAPI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .about-hero {
+      background: #1a1a1a;
+      padding: 90px 5% 80px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+    .about-hero-text { max-width: 600px; }
+    .about-hero-tag {
+      display: inline-block;
+      background: rgba(255,255,255,0.1);
+      color: #ccc;
+      font-size: 0.8rem; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 6px 14px; border-radius: 50px;
+      margin-bottom: 20px;
+    }
+    .about-hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 3rem; font-weight: 800;
+      color: #fff; margin: 0 0 20px;
+      line-height: 1.1;
+    }
+    .about-hero h1 em { color: #f5c542; font-style: normal; }
+    .about-hero p { color: #aaa; font-size: 1.05rem; line-height: 1.7; margin: 0; }
+    .about-hero-img { font-size: 120px; }
+    .stats-bar {
+      background: #f5f0eb;
+      display: flex; flex-wrap: wrap;
+      gap: 0;
+    }
+    .stat-item {
+      flex: 1; min-width: 150px;
+      padding: 36px 24px;
+      text-align: center;
+      border-right: 1px solid #e0d8cf;
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-num { font-family: 'Syne', sans-serif; font-size: 2.2rem; font-weight: 800; margin-bottom: 4px; }
+    .stat-label { font-size: 0.85rem; color: #777; }
+    .about-section { padding: 80px 5%; background: #fff; }
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+    .about-grid.reverse { direction: rtl; }
+    .about-grid.reverse > * { direction: ltr; }
+    .about-section-tag {
+      display: inline-block;
+      background: #f5f0eb;
+      color: #888; font-size: 0.8rem; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 5px 12px; border-radius: 50px;
+      margin-bottom: 16px;
+    }
+    .about-section h2 { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; margin: 0 0 16px; }
+    .about-section p { color: #555; line-height: 1.8; margin: 0 0 16px; font-size: 1rem; }
+    .about-illustration { font-size: 120px; text-align: center; background: #f5f0eb; border-radius: 20px; padding: 40px; }
+    .values-section { padding: 80px 5%; background: #fafafa; }
+    .values-section h2 { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; text-align: center; margin: 0 0 48px; }
+    .values-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 24px; }
+    .value-card {
+      background: #fff; border-radius: 16px; border: 1px solid #eee;
+      padding: 28px; transition: transform 0.2s;
+    }
+    .value-card:hover { transform: translateY(-4px); }
+    .value-icon { font-size: 36px; margin-bottom: 16px; }
+    .value-card h3 { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; margin: 0 0 10px; }
+    .value-card p { font-size: 0.9rem; color: #666; line-height: 1.6; margin: 0; }
+    .team-section { padding: 80px 5%; background: #fff; }
+    .team-section h2 { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; text-align: center; margin: 0 0 48px; }
+    .team-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 28px; }
+    .team-card { text-align: center; }
+    .team-avatar {
+      width: 90px; height: 90px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px; margin: 0 auto 14px;
+    }
+    .team-card h4 { font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 700; margin: 0 0 4px; }
+    .team-card span { font-size: 0.82rem; color: #888; }
+    .cta-section {
+      background: #1a1a1a; color: #fff;
+      padding: 80px 5%; text-align: center;
+    }
+    .cta-section h2 { font-family: 'Syne', sans-serif; font-size: 2.2rem; font-weight: 800; margin: 0 0 14px; }
+    .cta-section p { color: #aaa; font-size: 1rem; margin: 0 0 32px; }
+    .btn-light {
+      background: #fff; color: #1a1a1a;
+      padding: 14px 36px; border: none; border-radius: 50px;
+      font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 600;
+      cursor: pointer; text-decoration: none; display: inline-block;
+      transition: background 0.2s;
+    }
+    .btn-light:hover { background: #f0f0f0; }
+    @media (max-width: 768px) {
+      .about-hero h1 { font-size: 2.2rem; }
+      .about-grid { grid-template-columns: 1fr; gap: 30px; }
+      .about-grid.reverse { direction: ltr; }
+      .about-hero-img { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo"><a href="index.html" style="text-decoration:none;color:inherit;">SHOP<span>API</span></a></div>
+    <div class="search-bar">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" placeholder="Search products, brands…"/>
+    </div>
+    <nav id="mainNav">
+      <a href="index.html">Home</a>
+      <a href="products.html">Products</a>
+      <a href="categories.html">Categories</a>
+      <a href="about.html" class="active">About</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <div class="cart-icon" id="cartIcon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      <div class="cart-badge" id="cartBadge">0</div>
+    </div>
+    <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+  </div>
+</header>
+
+<section class="about-hero">
+  <div class="about-hero-text">
+    <div class="about-hero-tag">Our Story</div>
+    <h1>We Make Shopping <em>Feel Good</em></h1>
+    <p>SHOPAPI started with a simple belief: buying the things you love shouldn't be complicated. We're a Filipino-built marketplace that puts you first — always.</p>
+  </div>
+  <div class="about-hero-img">🛒</div>
+</section>
+
+<div class="stats-bar">
+  <div class="stat-item"><div class="stat-num">50K+</div><div class="stat-label">Happy Customers</div></div>
+  <div class="stat-item"><div class="stat-num">1,200+</div><div class="stat-label">Products Listed</div></div>
+  <div class="stat-item"><div class="stat-num">4.9★</div><div class="stat-label">Average Rating</div></div>
+  <div class="stat-item"><div class="stat-num">24/7</div><div class="stat-label">Customer Support</div></div>
+</div>
+
+<section class="about-section">
+  <div class="about-grid">
+    <div>
+      <div class="about-section-tag">Our Mission</div>
+      <h2>Built to Bring You the Best</h2>
+      <p>We handpick every item on SHOPAPI — from trendy apparel to everyday home essentials. Our team of product curators scours the market so you don't have to.</p>
+      <p>We partner with trusted local and international brands to ensure quality that matches every price point, big or small.</p>
+    </div>
+    <div class="about-illustration">🎯</div>
+  </div>
+</section>
+
+<section class="about-section" style="background:#fafafa;">
+  <div class="about-grid reverse">
+    <div>
+      <div class="about-section-tag">Why SHOPAPI</div>
+      <h2>Shopping That Works for You</h2>
+      <p>Fast checkout, easy returns, and a cart that remembers your picks. We've thought through every step of your shopping experience.</p>
+      <p>Whether you're on desktop or mobile, SHOPAPI adapts to you — not the other way around.</p>
+    </div>
+    <div class="about-illustration">⚡</div>
+  </div>
+</section>
+
+<section class="values-section">
+  <h2>What We Stand For</h2>
+  <div class="values-grid">
+    <div class="value-card"><div class="value-icon">🤝</div><h3>Trust First</h3><p>Every seller goes through verification. Every product is quality-checked before it reaches your door.</p></div>
+    <div class="value-card"><div class="value-icon">🚀</div><h3>Fast Delivery</h3><p>We partner with reliable couriers to make sure your orders arrive on time, every time.</p></div>
+    <div class="value-card"><div class="value-icon">♻️</div><h3>Sustainability</h3><p>We're working toward eco-friendly packaging and supporting brands with green practices.</p></div>
+    <div class="value-card"><div class="value-icon">💬</div><h3>Real Support</h3><p>Got a problem? Talk to a real person. Our support team is available around the clock.</p></div>
+  </div>
+</section>
+
+<section class="team-section">
+  <h2>Meet the Team</h2>
+  <div class="team-grid">
+    <div class="team-card"><div class="team-avatar" style="background:#f5e6d8;">👩‍💼</div><h4>Andrea Reyes</h4><span>CEO & Co-Founder</span></div>
+    <div class="team-card"><div class="team-avatar" style="background:#dce8f5;">👨‍💻</div><h4>Marco Villanueva</h4><span>Head of Technology</span></div>
+    <div class="team-card"><div class="team-avatar" style="background:#fce8f3;">👩‍🎨</div><h4>Bianca Santos</h4><span>Creative Director</span></div>
+    <div class="team-card"><div class="team-avatar" style="background:#e8f5e9;">👨‍📦</div><h4>Luis Aguilar</h4><span>Operations Lead</span></div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <h2>Ready to Start Shopping?</h2>
+  <p>Thousands of products. One cart. Zero hassle.</p>
+  <a href="products.html" class="btn-light">Browse Products →</a>
+</section>
+
+<div class="cart-overlay" id="cartOverlay"></div>
+<div class="cart-sidebar" id="cartSidebar">
+  <div class="cart-header"><h3>🛒 My Cart</h3><button class="close-cart" id="closeCartBtn">✕</button></div>
+  <div class="cart-body" id="cartBody"><p style="text-align:center;padding:40px;">Your cart is empty.</p></div>
+  <div class="cart-footer">
+    <div class="cart-voucher" id="cartVoucher" style="display:none;"></div>
+    <div class="cart-total"><span>Total</span><span id="cartTotal">₱0</span></div>
+    <button class="btn-checkout" id="checkoutBtn">Proceed to Checkout →</button>
+  </div>
+</div>
+<div class="toast" id="toast"><span class="toast-icon">✓</span><span id="toastMsg"></span></div>
+
+<script src="script.js"></script>
+</body>
+</html>

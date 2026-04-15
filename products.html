@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Products – SHOPAPI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .page-hero { background: linear-gradient(135deg, #f5f0eb, #e8e0d5); padding: 60px 5%; text-align: center; }
+    .page-hero h1 { font-family: 'Syne', sans-serif; font-size: 2.8rem; font-weight: 800; margin: 0 0 10px; }
+    .page-hero p { color: #555; font-size: 1.05rem; margin: 0; }
+    .filters-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      padding: 20px 5%;
+      border-bottom: 1px solid #eee;
+      background: #fff;
+      position: sticky;
+      top: 68px;
+      z-index: 10;
+    }
+    .filter-label { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.85rem; letter-spacing: 0.05em; text-transform: uppercase; margin-right: 4px; }
+    .filter-btn {
+      padding: 8px 20px;
+      border-radius: 50px;
+      border: 1.5px solid #ddd;
+      background: transparent;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .filter-btn:hover, .filter-btn.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+    .sort-select {
+      margin-left: auto;
+      padding: 8px 16px;
+      border: 1.5px solid #ddd;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      background: #fff;
+      cursor: pointer;
+    }
+    .products-section { padding: 40px 5% 80px; background: #fafafa; }
+    .products-count { font-size: 0.9rem; color: #888; margin-bottom: 24px; }
+    .all-products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 28px;
+    }
+    /* FIXED: card uses flex column, button pushed to bottom */
+    .product-card {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: #fff;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid #eee;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .product-card:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
+    .product-img-wrap {
+      background: #f8f6f2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 200px;
+      padding: 20px;
+      cursor: pointer;
+      position: relative;
+    }
+    .product-img-wrap img { max-width: 140px; max-height: 140px; object-fit: contain; transition: transform 0.2s; }
+    .product-img-wrap:hover img { transform: scale(1.05); }
+    .quick-view-badge {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.6);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .product-img-wrap:hover .quick-view-badge { opacity: 1; }
+    .product-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 18px;
+    }
+    .product-tag { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: #999; margin-bottom: 6px; }
+    .badge-new, .badge-sale {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-bottom: 8px;
+      margin-right: 6px;
+    }
+    .badge-new { background: #e8f5e9; color: #2e7d32; }
+    .badge-sale { background: #fff3e0; color: #e65100; }
+    .product-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; margin-bottom: 6px; }
+    .stars { color: #f5a623; font-size: 0.8rem; margin-bottom: 8px; }
+    .product-price { font-size: 1.1rem; font-weight: 700; margin-bottom: 12px; color: #1a1a1a; }
+    .original-price { text-decoration: line-through; color: #aaa; font-size: 0.85rem; margin-left: 8px; font-weight: normal; }
+    .btn-cart {
+      margin-top: auto;
+      width: 100%;
+      padding: 10px;
+      background: #1a1a1a;
+      color: #fff;
+      border: none;
+      border-radius: 30px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-cart:hover { background: #333; }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: white;
+      max-width: 800px;
+      width: 90%;
+      border-radius: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      padding: 24px;
+      gap: 24px;
+      position: relative;
+    }
+    .modal-close {
+      position: absolute;
+      top: 16px; right: 20px;
+      font-size: 28px;
+      cursor: pointer;
+      background: none;
+      border: none;
+    }
+    .modal-img { flex: 1; text-align: center; }
+    .modal-img img { max-width: 100%; max-height: 300px; }
+    .modal-info { flex: 1; }
+    .modal-info h3 { font-family: 'Syne', sans-serif; font-size: 1.6rem; margin-bottom: 10px; }
+    @media (max-width: 600px) {
+      .page-hero h1 { font-size: 2rem; }
+      .filters-bar { top: 60px; }
+      .sort-select { margin-left: 0; width: 100%; margin-top: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo"><a href="index.html" style="text-decoration:none;color:inherit;">SHOP<span>API</span></a></div>
+    <div class="search-bar">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="searchInput" placeholder="Search products, brands…"/>
+    </div>
+    <nav id="mainNav">
+      <a href="index.html">Home</a>
+      <a href="products.html" class="active">Products</a>
+      <a href="categories.html">Categories</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <div class="cart-icon" id="cartIcon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      <div class="cart-badge" id="cartBadge">0</div>
+    </div>
+    <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+  </div>
+</header>
+
+<div class="page-hero">
+  <h1>All Products</h1>
+  <p>Discover our full collection — fresh drops, bestsellers, and daily essentials.</p>
+</div>
+
+<div class="filters-bar">
+  <span class="filter-label">Filter:</span>
+  <button class="filter-btn active" data-filter="all">All</button>
+  <button class="filter-btn" data-filter="apparel">Apparel</button>
+  <button class="filter-btn" data-filter="gadgets">Gadgets</button>
+  <button class="filter-btn" data-filter="beauty">Beauty</button>
+  <button class="filter-btn" data-filter="home">Home</button>
+  <button class="filter-btn" data-filter="grocery">Grocery</button>
+  <button class="filter-btn" data-filter="sale">Sale</button>
+  <select class="sort-select" id="sortSelect">
+    <option value="">Sort: Featured</option>
+    <option value="price-asc">Price: Low to High</option>
+    <option value="price-desc">Price: High to Low</option>
+    <option value="name">Name A–Z</option>
+  </select>
+</div>
+
+<section class="products-section">
+  <p class="products-count" id="countLabel">Showing 14 products</p>
+  <div class="all-products-grid" id="allProductsGrid">
+    <!-- 1. bag.png -->
+    <div class="product-card" data-category="apparel" data-price="1299" data-name="Everyday Backpack">
+      <div class="product-img-wrap" onclick="quickView('Everyday Backpack','₱1,299','bag','Apparel','Spacious backpack with laptop compartment, water-resistant.')">
+        <img src="shopapiPics/bag.png" onerror="this.src='https://via.placeholder.com/140x140?text=Bag'" alt="Bag">
+        <div class="quick-view-badge">🔍 Quick view</div>
+      </div>
+      <div class="product-info">
+        <div class="product-tag">Apparel</div>
+        <div class="product-name">Everyday Backpack</div>
+        <div class="stars">★★★★☆</div>
+        <div class="product-price">₱1,299</div>
+        <button class="btn-cart" onclick="addToCart('Everyday Backpack','₱1,299','bag')">Add to Cart</button>
+      </div>
+    </div>
+    <!-- 2. beauty.png -->
+    <div class="product-card" data-category="beauty" data-price="899" data-name="Beauty Glow-Up Kit">
+      <div class="product-img-wrap" onclick="quickView('Beauty Glow-Up Kit','₱899','beauty','Beauty','Complete skincare set with serum, moisturizer, and face mask.')">
+        <img src="shopapiPics/beauty.png" onerror="this.src='https://via.placeholder.com/140x140?text=Beauty'" alt="Beauty">
+        <div class="quick-view-badge">🔍 Quick view</div>
+      </div>
+      <div class="product-info">
+        <div class="product-tag">Beauty</div>
+        <div class="badge-new">NEW</div>
+        <div class="product-name">Beauty Glow-Up Kit</div>
+        <div class="stars">★★★★★</div>
+        <div class="product-price">₱899</div>
+        <button class="btn-cart" onclick="addToCart('Beauty Glow-Up Kit','₱899','beauty')">Add to Cart</button>
+      </div>
+    </div>
+    <!-- 3. chair.png -->
+    <div class="product-card" data-category="home" data-price="4999" data-name="Ergonomic Office Chair">
+      <div class="product-img-wrap" onclick="quickView('Ergonomic Office Chair','₱4,999','chair','Home','Adjustable height, lumbar support, breathable mesh.')">
+        <img src="shopapiPics/chair.png" onerror="this.src='https://via.placeholder.com/140x140?text=Chair'" alt="Chair">
+        <div class="quick-view-badge">🔍 Quick view</div>
+      </div>
+      <div class="product-info">
+        <div class="product-tag">Home</div>
+        <div class="product-name">Ergonomic Office Chair</div>
+        <div class="stars">★★★★☆</div>
+        <div class="product-price">₱4,999</div>
+        <button class="btn-cart" onclick="addToCart('Ergonomic Office Chair','₱4,999','chair')">Add to Cart</button>
+      </div>
+    </div>
+    <!-- 4. fan.png -->
+    <div class="product-card" data-category="home" data-price="1791" data-name="Summer Must-Have Fan">
+      <div class="product-img-wrap" onclick="quickView('Summer Must-Have Fan','₱1,791','fan','Home','Energy-efficient stand fan, 3 speeds, quiet operation.')">
+        <img src="shopapiPics/fan.png" onerror="this.src='https://via.placeholder.com/140x140?text=Fan'" alt="Fan">
+        <div class="quick-view-badge">🔍 Quick view</div>
+      </div>
+      <div class="product-info">
+        <div class="product-tag">Home</div>
+        <div class="badge-sale">SALE</div>
+        <div class="product-name">Summer Must-Have Fan</div>
+        <div class="stars">★★★★☆</div>
+        <div class="product-price">₱1,791</div>
+        <button class="btn-cart" onclick="addToCart('Summer Must-Have Fan','₱1,791','fan')">Add to Cart</button>
+      </div>
+    </div>
+    <!-- 5. gadgets.png -->
+    <div class="product-card" data-category="gadgets" data-price="2499" data-name="Smart Gadget Bundle">
+      <div class="product-img-wrap" onclick="quickView('Smart Gadget Bundle','₱2,499','gadgets','Gadgets','Includes smart plug, LED strip, and voice assistant.')">
+        <img src="shopapiPics/gadgets.png" onerror="this.src='https://via.placeholder.com/140x140?text=Gadgets'" alt="Gadgets">
+        <div class="quick-view-badge">🔍 Quick view</div>
+      </div>
+      <div class="product-info">
+        <div class="product-tag">Gadgets</div>
+        <div class="product-name">Smart Gadget Bundle</div>
+        <div class="stars">★★★★★</div>
+        <div class="product-price">₱2,499</div>
+        <button class="btn-cart" onclick="addToCart('Smart Gadget Bundle','₱2,499','gadgets')">Add to Cart</button>
+      </div>
+    </div>
+    <!-- 6. headphone.png -->
+    <div class="product-card" data-category="gadgets" data-price="1791" data-name="Noise Cancelling Headphones">
+      <div class="product-img-wrap" onclick="quickView('Noise Cancelling Headphones','₱1,791','headphone','Gadgets','Wireless over-ear headphones with active noise cancellation.')">
+        <img src="shopapiPics/headphone.png" onerror="this.src='https://via.placeholder.com/140x140?text=Headphone'" alt="Headphone">
+        <div class="quick-view-badge">🔍 Quick view</div>
+      </div>
+      <div class="product-info">
+        <div class="product-tag">Gadgets</div>
+        <div class="product-name">Noise Cancelling Headphones</div>
+        <div class="stars">★★★★★</div>
+        <div class="product-price">₱1,791</div>
+        <button class="btn-cart" onclick="addToCart('Noise Cancelling Headphones','₱1,791','headphone')">Add to Cart</button>
+      </div>
+    </div>
+    <!-- 7. iphone.png -->
+    <div class="product-card" data-category="gadgets" data-price="32500" data-name="iPhone 13 (Refurbished)">
+      <div class="product-img-wrap" onclick="quickView('iPhone 13 (Refurbished)','₱32,500','iphone','Gadgets','6.1" Super Retina XDR, A15 Bionic, 128GB.')">
+        <img src="shopapiPics/iphone.png" onerror="this.src='https://via.placeholder.com/140x140?text=iPhone'" alt="iPhone">
+        <div class="quick-view-badge">🔍 Quick view</div>
+      </div>
+      <div class="product-info">
+        <div class="product-tag">Gadgets</div>
+        <div class="badge-new">NEW</div>
+        <div class="product-name">iPhone 13 (Refurbished)</div>
+        <div class="stars">★★★★★</div>
+        <div class="product-price">₱32,500</div>
+        <button class="btn-cart" onclick="addToCart('iPhone 13','₱32,500','iphone')">Add to Cart</button>
+      </div>
+    </div>
+    <!-- 8. lowPrice.png -->
+    <div class="product-card" data-category="sale" data-price="199" data-name="Low Price Today – Daily Deal">
+      <div class="product-img-wrap" onclick="quickView('Low Price Today – Daily Deal','₱199','lowPrice','Sale','Limited-time offer! Grab this amazing deal before it expires.')">
+        <img src="shopapiPics/lowPrice.png" onerror="this.src='https://via.placeholder.com/140x140?text=Deal'" alt="Deal">
+        <div class="quick-view-badge">🔍 Quick view</div>
+      </div>
+      <div class="product-info">
+        <div class="product-tag">Sale</div>
+        <div class="badge-sale">FLASH SALE</div>
+        <div class="product-name">Low Price Today – Daily Deal</div>
+        <div class="stars">★★★★★</div>
+        <div class="product-price">₱199</div>
+        <button class="btn-cart" onclick="addToCart('Low Price Today – Daily Deal','₱199','lowPrice')">Add to Cart</button>
+      </div>
+    </div>
+    <!-- 9. makeup.png -->
+    <div class="product-card" data-category="beauty" data-price="349" data-name="Essential Makeup Kit">
+      <div class="product-img-wrap" onclick="quickView('Essential Makeup Kit','₱349','makeup','Beauty','Set of 3 powder blushes, natural pigments, long-lasting.')">
+        <img src="shopapiPics/makeup.png" onerror="this.src='https://via.placeholder.com/140x140?text=Makeup'" alt="Makeup">
+        <div class="quick-view-badge">🔍 Quick view</div>
+      </div>
+      <div class="product-info">
+        <div class="product-tag">Beauty</div>
+        <div class="product-name">Essential Makeup Kit</div>
+        <div class="stars">★★★★☆</div>
+        <div class="product-price">₱349</div>
+        <button class="btn-cart" onclick="addToCart('Essential Makeup Kit','₱349','makeup')">Add to Cart</button>
+      </div>
+    </div>
+    <!-- 10. makeUp (2).png -->
+    <div class="product-card" data-category="beauty" data-price="599" data-name="Luxury Lipstick Set">
+      <div class="product-img-wrap" onclick="quickView('Luxury Lipstick Set','₱599','makeUp2','Beauty','Set of 5 matte liquid lipsticks, long-wear and transfer-proof.')">
+        <img src="shopapiPics/makeUp%20(2).png" onerror="this.src='https://via.placeholder.com/140x140?text=Lipstick'" alt="Lipstick">
+        <div class="quick-view-badge">🔍 Quick view</div>
+      </div>
+      <div class="product-info">
+        <div class="product-tag">Beauty</div>
+        <div class="badge-new">NEW</div>
+        <div class="product-name">Luxury Lipstick Set</div>
+        <div class="stars">★★★★★</div>
+        <div class="product-price">₱599</div>
+        <button class="btn-cart" onclick="addToCart('Luxury Lipstick Set','₱599','makeUp2')">Add to Cart</button>
+      </div>
+    </div>
+    <!-- 11. men.png -->
+    <div class="product-card" data-category="apparel" data-price="1499" data-name="Men’s Apparel Collection">
+      <div class="product-img-wrap" onclick="quickView('Men’s Apparel Collection','₱1,499','men','Apparel','Classic t-shirt, shorts, and cap set.')">
+        <img src="shopapiPics/mens.png" onerror="this.src='https://via.placeholder.com/140x140?text=Men'" alt="Men">
+        <div class="quick-view-badge">🔍 Quick view</div>
+      </div>
+      <div class="product-info">
+        <div class="product-tag">Apparel</div>
+        <div class="product-name">Men’s Apparel Collection</div>
+        <div class="stars">★★★★☆</div>
+        <div class="product-price">₱1,499</div>
+        <button class="btn-cart" onclick="addToCart('Men’s Apparel Collection','₱1,499','men')">Add to Cart</button>
+      </div>
+    </div>
+    <!-- 12. noodles.png -->
+    <div class="product-card" data-category="grocery" data-price="240" data-name="Instant Noodle Pack (12pcs)">
+      <div class="product-img-wrap" onclick="quickView('Instant Noodle Pack','₱240','noodles','Grocery','12-pack of classic instant noodles, quick and easy meal.')">
+        <img src="shopapiPics/noodles.png" onerror="this.src='https://via.placeholder.com/140x140?text=Noodles'" alt="Noodles">
+        <div class="quick-view-badge">🔍 Quick view</div>
+      </div>
+      <div class="product-info">
+        <div class="product-tag">Grocery</div>
+        <div class="product-name">Instant Noodle Pack (12pcs)</div>
+        <div class="stars">★★★★☆</div>
+        <div class="product-price">₱240</div>
+        <button class="btn-cart" onclick="addToCart('Instant Noodle Pack','₱240','noodles')">Add to Cart</button>
+      </div>
+    </div>
+    <!-- 13. powder.png -->
+    <div class="product-card" data-category="beauty" data-price="450" data-name="Translucent Setting Powder">
+      <div class="product-img-wrap" onclick="quickView('Translucent Setting Powder','₱450','powder','Beauty','Lightweight, oil-control, matte finish.')">
+        <img src="shopapiPics/powder.png" onerror="this.src='https://via.placeholder.com/140x140?text=Powder'" alt="Powder">
+        <div class="quick-view-badge">🔍 Quick view</div>
+      </div>
+      <div class="product-info">
+        <div class="product-tag">Beauty</div>
+        <div class="product-name">Translucent Setting Powder</div>
+        <div class="stars">★★★★★</div>
+        <div class="product-price">₱450</div>
+        <button class="btn-cart" onclick="addToCart('Translucent Setting Powder','₱450','powder')">Add to Cart</button>
+      </div>
+    </div>
+    <!-- 14. shoes.png -->
+    <div class="product-card" data-category="apparel" data-price="2999" data-name="Classic Running Shoes">
+      <div class="product-img-wrap" onclick="quickView('Classic Running Shoes','₱2,999','shoes','Apparel','Breathable mesh, cushioned sole, durable grip.')">
+        <img src="shopapiPics/shoes.png" onerror="this.src='https://via.placeholder.com/140x140?text=Shoes'" alt="Shoes">
+        <div class="quick-view-badge">🔍 Quick view</div>
+      </div>
+      <div class="product-info">
+        <div class="product-tag">Apparel</div>
+        <div class="badge-sale">SALE</div>
+        <div class="product-name">Classic Running Shoes</div>
+        <div class="stars">★★★★☆</div>
+        <div class="product-price">₱2,999 <span class="original-price">₱3,499</span></div>
+        <button class="btn-cart" onclick="addToCart('Classic Running Shoes','₱2,999','shoes')">Add to Cart</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Quick View Modal -->
+<div id="quickViewModal" class="modal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeModal()">&times;</button>
+    <div class="modal-img"><img id="modalImg" src="" alt="Product"></div>
+    <div class="modal-info">
+      <h3 id="modalName"></h3>
+      <p id="modalCat" style="color:#777; text-transform:uppercase; font-size:0.8rem;"></p>
+      <div class="stars" id="modalStars">★★★★★</div>
+      <p id="modalPrice" style="font-size:1.4rem; font-weight:700; margin:10px 0;"></p>
+      <p id="modalDesc" style="margin:15px 0; line-height:1.5;"></p>
+      <button class="btn-cart" id="modalAddBtn" style="width:auto; padding:12px 24px;">Add to Cart</button>
+    </div>
+  </div>
+</div>
+
+<div class="cart-overlay" id="cartOverlay"></div>
+<div class="cart-sidebar" id="cartSidebar">
+  <div class="cart-header"><h3>🛒 My Cart</h3><button class="close-cart" id="closeCartBtn">✕</button></div>
+  <div class="cart-body" id="cartBody"><p style="text-align:center;padding:40px;">Your cart is empty.</p></div>
+  <div class="cart-footer">
+    <div class="cart-voucher" id="cartVoucher" style="display:none;"></div>
+    <div class="cart-total"><span>Total</span><span id="cartTotal">₱0</span></div>
+    <button class="btn-checkout" id="checkoutBtn">Proceed to Checkout →</button>
+  </div>
+</div>
+<div class="toast" id="toast"><span class="toast-icon">✓</span><span id="toastMsg"></span></div>
+
+<script src="script.js"></script>
+<script>
+  let currentQuickProduct = null;
+  function quickView(name, price, id, category, desc) {
+    currentQuickProduct = { name, price, id, category, desc };
+    document.getElementById('modalName').innerText = name;
+    document.getElementById('modalCat').innerText = category;
+    document.getElementById('modalPrice').innerText = price;
+    document.getElementById('modalDesc').innerText = desc;
+    let imgFile = id;
+    if (id === 'makeUp2') imgFile = 'makeUp%20(2)';
+    const imgEl = document.getElementById('modalImg');
+    imgEl.src = `shopapiPics/${imgFile}.png`;
+    imgEl.onerror = () => { imgEl.src = 'https://via.placeholder.com/300x300?text=Product'; };
+    document.getElementById('quickViewModal').style.display = 'flex';
+    document.getElementById('modalAddBtn').onclick = () => {
+      addToCart(name, price, id);
+      closeModal();
+    };
+  }
+  function closeModal() { document.getElementById('quickViewModal').style.display = 'none'; }
+  window.onclick = function(e) { if (e.target === document.getElementById('quickViewModal')) closeModal(); };
+
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const sortSelect = document.getElementById('sortSelect');
+  const searchInput = document.getElementById('searchInput');
+  const grid = document.getElementById('allProductsGrid');
+  const countLabel = document.getElementById('countLabel');
+  function filterAndSort() {
+    const activeFilter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
+    const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+    const cards = Array.from(document.querySelectorAll('#allProductsGrid .product-card'));
+    let visible = cards.filter(card => {
+      const catMatch = activeFilter === 'all' || card.dataset.category === activeFilter;
+      const name = card.dataset.name ? card.dataset.name.toLowerCase() : card.querySelector('.product-name')?.innerText.toLowerCase() || '';
+      const searchMatch = name.includes(searchTerm);
+      return catMatch && searchMatch;
+    });
+    const sortVal = sortSelect.value;
+    if (sortVal === 'price-asc') visible.sort((a,b) => +a.dataset.price - +b.dataset.price);
+    if (sortVal === 'price-desc') visible.sort((a,b) => +b.dataset.price - +a.dataset.price);
+    if (sortVal === 'name') visible.sort((a,b) => (a.dataset.name || a.querySelector('.product-name').innerText).localeCompare(b.dataset.name || b.querySelector('.product-name').innerText));
+    visible.forEach(card => grid.appendChild(card));
+    countLabel.textContent = `Showing ${visible.length} product${visible.length !== 1 ? 's' : ''}`;
+  }
+  filterBtns.forEach(btn => btn.addEventListener('click', () => { filterBtns.forEach(b => b.classList.remove('active')); btn.classList.add('active'); filterAndSort(); }));
+  if (sortSelect) sortSelect.addEventListener('change', filterAndSort);
+  if (searchInput) searchInput.addEventListener('input', filterAndSort);
+  filterAndSort();
+</script>
+</body>
+</html>
