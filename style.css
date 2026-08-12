@@ -298,3 +298,9 @@ section { padding: 72px 24px; }
   .hamburger { display: flex; }
   .search-bar { display: none; }
 }
+.hero {
+    padding-bottom: 50px !important;
+}
+.categories-section {
+    padding-top: 100px !important;
+}
